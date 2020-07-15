@@ -79,7 +79,7 @@ Cell type prioritizations are stored in the `AUC` data frame - for example:
 > head(augur$AUC, 5)
 
 # A tibble: 20 x 2  cell_type   auc  <chr>       <dbl>1 cell type 1 0.7522 cell type 2 0.7293 cell type 3 0.674
-  ...                     ...```
+  ...         ...```
 
 Augur can also run directly on a Seurat object. For a Seurat object `sc`, with the `sc@meta.data` data frame containing `cell_type` and `label` columns, simply do:
 
@@ -125,7 +125,7 @@ We run `calculate_auc`, and inspect the cell type prioritizations in the `AUC` i
 
 Augur has correctly recovered the simulated perturbation intensities. 
 
-Running this example on a MacBook takes between 3 and 4 minutes. 
+Running this example on a MacBook takes about 3-4 minutes. 
 However, analyzing >20 real single-cell RNA-seq datasets, we found Augur takes a median of ~45 minutes.
 In general, runtime scales close to linearly with the number of cell _types_.
 By default, Augur runs on four cores, with each cell type analyzed on a different core.

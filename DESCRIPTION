@@ -20,7 +20,7 @@ Imports:
 	parsnip (>= 0.0.2),
 	recipes (>= 0.1.4),
 	rsample (>= 0.0.4),
-	yardstick (>= 0.0.3),
+	yardstick (>= 0.0.7),
 	pbmcapply (>= 1.5.0),
 	lmtest (>= 0.9-37),
 	randomForest (>= 4.6-14),
@@ -34,4 +34,4 @@ VignetteBuilder: knitr
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 RdMacros: Rdpack
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0

@@ -4,13 +4,23 @@
 \alias{calculate_auc}
 \title{Prioritize cell types involved in a biological process}
 \usage{
-calculate_auc(input, meta = NULL, label_col = "label",
-  cell_type_col = "cell_type", n_subsamples = 50,
-  subsample_size = 20, folds = 3, min_cells = NULL,
-  var_quantile = 0.5, feature_perc = 0.5, n_threads = 4,
-  show_progress = T, classifier = c("rf", "lr"),
-  rf_params = list(trees = 100, mtry = 2, min_n = NULL, importance =
-  "accuracy"), lr_params = list(mixture = 1, penalty = "auto"))
+calculate_auc(
+  input,
+  meta = NULL,
+  label_col = "label",
+  cell_type_col = "cell_type",
+  n_subsamples = 50,
+  subsample_size = 20,
+  folds = 3,
+  min_cells = NULL,
+  var_quantile = 0.5,
+  feature_perc = 0.5,
+  n_threads = 4,
+  show_progress = T,
+  classifier = c("rf", "lr"),
+  rf_params = list(trees = 100, mtry = 2, min_n = NULL, importance = "accuracy"),
+  lr_params = list(mixture = 1, penalty = "auto")
+)
 }
 \arguments{
 \item{input}{a matrix, data frame, or \code{Seurat} or \code{monocle} object

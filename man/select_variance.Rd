@@ -4,8 +4,7 @@
 \alias{select_variance}
 \title{Feature selection based on variance}
 \usage{
-select_variance(mat, var_quantile = 0.5,
-  filter_negative_residuals = FALSE)
+select_variance(mat, var_quantile = 0.5, filter_negative_residuals = FALSE)
 }
 \arguments{
 \item{mat}{a single-cell matrix to be filtered, with features (genes) in rows

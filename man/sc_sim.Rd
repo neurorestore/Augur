@@ -4,7 +4,9 @@
 \name{sc_sim}
 \alias{sc_sim}
 \title{A simulated single-cell RNA-seq dataset}
-\format{a Seurat object with dimensions 15,697 genes x 600 cells}
+\format{
+a Seurat object with dimensions 15,697 genes x 600 cells
+}
 \usage{
 data(sc_sim)
 }
