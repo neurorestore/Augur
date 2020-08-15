@@ -151,7 +151,7 @@ calculate_auc = function(input,
   }
 
   # check glmnet is installed for logistic regression
-  if (!requireNamespace("glmnet", quietly = TRUE)) {
+  if (classifier == 'lr' && !requireNamespace("glmnet", quietly = TRUE)) {
     stop("install \"glmnet\" R package to run Augur with logistic regression ",
          "classifier", call. = FALSE)
   }
