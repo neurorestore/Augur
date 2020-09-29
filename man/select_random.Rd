@@ -14,10 +14,10 @@ and cells in columns}
 the technical variance filter}
 }
 \value{
-the filtered matrix (or, if \code{feature_perc == 1}, the input 
-  matrix)
+the filtered matrix (or, if \code{feature_perc == 1}, the input
+matrix)
 }
 \description{
-Perform feature selection on a single-cell feature matrix (e.g., gene 
+Perform feature selection on a single-cell feature matrix (e.g., gene
 expression) by randomly removing a specified proportion of features.
 }

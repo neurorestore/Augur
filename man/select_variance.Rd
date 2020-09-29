@@ -18,7 +18,7 @@ threshold of zero, instead of \code{var_quantile}}
 }
 \value{
 the filtered matrix (or, if \code{var_quantile == 1} and
-  \code{filter_negative_residuals == FALSE}, the input matrix)
+\code{filter_negative_residuals == FALSE}, the input matrix)
 }
 \description{
 Perform feature selection on a single-cell feature matrix (e.g., gene

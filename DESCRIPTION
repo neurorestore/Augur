@@ -1,6 +1,6 @@
 Package: Augur
 Title: Cell type prioritization in high-dimensional single-cell data
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(
   person("Michael", "Skinnider", email = "michael.skinnider@msl.ubc.ca",
          role = c("aut", "cre", "led")),
@@ -20,12 +20,17 @@ Imports:
 	parsnip (>= 0.0.2),
 	recipes (>= 0.1.4),
 	rsample (>= 0.0.4),
-	yardstick (>= 0.0.7),
+	yardstick (>= 0.0.3),
 	pbmcapply (>= 1.5.0),
 	lmtest (>= 0.9-37),
 	randomForest (>= 4.6-14),
 	tidyselect (>= 0.2.5),
 	rlang (>= 0.4.0),
+	ggplot2 (>= 3.0.0),
+	ggrepel (>= 0.8.2),
+	pals (>= 1.6),
+	scales (>= 1.1.1),
+	tidyr (>= 1.1.2),
 	methods,
 	stats,
 	Rdpack (>= 0.7)
@@ -34,4 +39,5 @@ VignetteBuilder: knitr
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 RdMacros: Rdpack
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0

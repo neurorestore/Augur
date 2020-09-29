@@ -2,7 +2,7 @@
 #'
 #' Prioritize cell types involved in a complex biological process by training a
 #' machine-learning model to predict sample labels (e.g., disease vs. control,
-#' treated vs. untreated, or time post-stimulus), and evaluate the performance 
+#' treated vs. untreated, or time post-stimulus), and evaluate the performance
 #' of the model in cross-validation.
 #'
 #' If a \code{Seurat} object is provided as input, Augur will use the default
@@ -10,9 +10,9 @@
 #' use a different assay, provide the expression matrix and metadata as input
 #' separately, using the \code{input} and \code{meta} arguments.
 #'
-#' @param input a matrix, data frame, or \code{Seurat} or \code{monocle} object
-#'   containing gene expression values (genes in rows, cells in columns) and,
-#'   optionally, metadata about each cell
+#' @param input a matrix, data frame, or \code{Seurat}, \code{monocle}, or
+#'   \code{SingleCellExperiment} object containing gene expression values
+#'   (genes in rows, cells in columns) and, optionally, metadata about each cell
 #' @param meta a data frame containing metadata about the \code{input}
 #'   gene-by-cell matrix, at minimum containing the cell type for each cell
 #'   and the labels (e.g., group, disease, timepoint); can be left as
@@ -29,9 +29,11 @@
 #'   draw from the complete dataset, for each cell type; defaults to \code{50}.
 #'   Set to \code{0} to omit subsampling altogether,
 #'   calculating performance on the entire dataset, but note that this may
-#'   introduce bias due to cell type or label class imbalance
+#'   introduce bias due to cell type or label class imbalance. 
+#'   Note that when setting \code{augur_mode = "permute"}, values less than 
+#'   \code{100} will be replaced with a default of \code{500}. 
 #' @param subsample_size the number of cells per type to subsample randomly from
-#'   each experimental condition, if \code{n_subsamples} is greater than 1; 
+#'   each experimental condition, if \code{n_subsamples} is greater than 1;
 #'   defaults to \code{20}
 #' @param folds the number of folds of cross-validation to run; defaults to
 #'   \code{3}. Be careful changing this parameter without also changing
@@ -43,20 +45,26 @@
 #'   each cell type using the variable gene filter (\link{select_variance});
 #'   defaults to \code{0.5}
 #' @param feature_perc the proportion of genes that are randomly selected as
-#'   features for input to the classifier in each subsample using the 
+#'   features for input to the classifier in each subsample using the
 #'   random gene filter (\link{select_random}); defaults to \code{0.5}
 #' @param n_threads the number of threads to use for parallelization;
 #'   defaults to \code{4}.
 #' @param show_progress if \code{TRUE}, display a progress bar for the analysis
 #'   with estimated time remaining
+#' @param augur_mode one of \code{"default"}, \code{"velocity"}, or
+#'   \code{"permute"}. Setting \code{augur_mode = "velocity"} disables feature
+#'   selection, assuming feature selection has been performed by the RNA
+#'   velocity procedure to produce the input matrix, while setting
+#'   \code{augur_mode = "permute"} will generate a null distribution of AUCs
+#'   for each cell type by permuting the labels
 #' @param classifier the classifier to use in calculating area under the curve,
 #'   one of \code{"rf"} (random forest) or \code{"lr"} (logistic regression);
 #'   defaults to \code{"rf"}, which is the recommended setting
 #' @param rf_params for \code{classifier} == \code{"rf"}, a list of parameters
-#'   for the random forest models, containing the following items (see 
-#'   \link[parsnip]{rand_forest} from the \code{parsnip} package): 
+#'   for the random forest models, containing the following items (see
+#'   \link[parsnip]{rand_forest} from the \code{parsnip} package):
 #'   \describe{
-#'     \item{"mtry"}{the number of features randomly sampled at each split 
+#'     \item{"mtry"}{the number of features randomly sampled at each split
 #'       in the random forest classifier; defaults to \code{2}}
 #'     \item{"trees"}{the number of trees in the random forest classifier;
 #'       defaults to \code{100}}
@@ -66,20 +74,20 @@
 #'       to use; defaults to \code{"accuracy"}; can also specify \code{"gini"}}
 #'   }
 #' @param lr_params for \code{classifier} == \code{"lr"}, a list of parameters
-#'   for the logistic regression models, containing the following items (see 
-#'   \link[parsnip]{logistic_reg} from the \code{parsnip} package):  
+#'   for the logistic regression models, containing the following items (see
+#'   \link[parsnip]{logistic_reg} from the \code{parsnip} package):
 #'   \describe{
 #'     \item{"mixture"}{the proportion of L1 regularization in the model;
 #'       defaults to \code{1}}
-#'     \item{"penalty"}{the total amount of regularization in the model; 
-#'       defaults to \code{"auto"}, which uses \link[glmnet]{cv.glmnet} to set 
+#'     \item{"penalty"}{the total amount of regularization in the model;
+#'       defaults to \code{"auto"}, which uses \link[glmnet]{cv.glmnet} to set
 #'       the penalty}
 #'   }
-#' 
+#'
 #' @return a list of class \code{"Augur"}, containing the following items:
 #' \enumerate{
-#'   \item \code{X}: the numeric matrix (or data frame or sparse matrix, 
-#'     depending on the input) containing gene expression values for each cell 
+#'   \item \code{X}: the numeric matrix (or data frame or sparse matrix,
+#'     depending on the input) containing gene expression values for each cell
 #'     in the dataset
 #'   \item \code{y}: the vector of experimental condition labels being predicted
 #'   \item \code{cell_types}: the vector of cell type labels
@@ -89,12 +97,12 @@
 #'     series of other classification metrics
 #'   \item \code{feature_importance}: the importance of each feature for
 #'     calculating the AUC, above. For random forest classifiers, this is the
-#'     mean decrease in accuracy or Gini index. For logistic regression 
+#'     mean decrease in accuracy or Gini index. For logistic regression
 #'     classifiers, this is the standardized regression coefficients, computed
 #'     using the Agresti method
-#'   \item \code{AUC}: a summary of the mean AUC for each cell type (for 
-#'     continuous experimental conditions, this is replaced by a \code{CCC} 
-#'     item that records the mean concordance correlation coefficient for each 
+#'   \item \code{AUC}: a summary of the mean AUC for each cell type (for
+#'     continuous experimental conditions, this is replaced by a \code{CCC}
+#'     item that records the mean concordance correlation coefficient for each
 #'     cell type)
 #' }
 #'
@@ -130,6 +138,7 @@ calculate_auc = function(input,
                          feature_perc = 0.5,
                          n_threads = 4,
                          show_progress = T,
+                         augur_mode = c('default', 'velocity', 'permute'),
                          classifier = c("rf", "lr"),
                          # random forest parameters
                          rf_params = list(trees = 100,
@@ -155,7 +164,7 @@ calculate_auc = function(input,
     stop("install \"glmnet\" R package to run Augur with logistic regression ",
          "classifier", call. = FALSE)
   }
-  
+
   # extract cell types and label from metadata
   if ("Seurat" %in% class(input)) {
     # confirm Seurat is installed
@@ -169,6 +178,10 @@ calculate_auc = function(input,
     cell_types = meta[[cell_type_col]]
     labels = meta[[label_col]]
     expr = Seurat::GetAssayData(input)
+
+    # print default assay
+    default_assay = Seurat::DefaultAssay(input)
+    message("using default assay: ", default_assay, " ...")
   } else if ("cell_data_set" %in% class(input)) {
     # confirm monocle3 is installed
     if (!requireNamespace("monocle3", quietly = TRUE)) {
@@ -182,14 +195,14 @@ calculate_auc = function(input,
     cell_types = meta[[cell_type_col]]
     labels = meta[[label_col]]
     expr = monocle3::exprs(input)
-  } else if ("SingleCellExperiment" %in% class(input)){ 
+  } else if ("SingleCellExperiment" %in% class(input)){
     # confirm SingleCellExperiment is installed
     if (!requireNamespace("SingleCellExperiment", quietly = TRUE)) {
       stop("install \"SingleCellExperiment\" R package for Augur ",
-           "compatibility with input SingleCellExperiment object", 
+           "compatibility with input SingleCellExperiment object",
            call. = FALSE)
     }
-    
+
     meta = SummarizedExperiment::colData(input) %>%
       droplevels() %>%
       as.data.frame()
@@ -215,7 +228,7 @@ calculate_auc = function(input,
     meta %<>% droplevels()
     cell_types = meta[[cell_type_col]]
     labels = meta[[label_col]]
-  } 
+  }
 
   # check dimensions are non-zero
   if (length(dim(expr)) != 2 || !all(dim(expr) > 0)) {
@@ -303,6 +316,19 @@ calculate_auc = function(input,
     apply_fun = mclapply
   }
 
+  # check augur mode
+  if (augur_mode == 'velocity') {
+    # reset feature selection
+    message("disabling feature selection for augur_mode=\"velocity\" ...")
+    feature_perc = 1
+    var_quantile = 1
+  } else if (augur_mode == 'permute' & n_subsamples < 100) {
+    message("resetting n_subsamples from ", n_subsamples, " to ", n_subsamples,
+            " for augur_mode=\"permute\" ...")
+    # reset default subsamples
+    n_subsamples = 500
+  }
+    
   # iterate over cell type clusters
   res = apply_fun(unique(cell_types),
     mc.cores = n_threads, function(cell_type) {
@@ -340,6 +366,11 @@ calculate_auc = function(input,
       for (subsample_idx in seq_len(n_iter)) {
         # seed RNG for reproducibility
         set.seed(subsample_idx)
+
+        # optionally, permute the labels
+        if (augur_mode == 'permute') {
+          y = sample(y)
+        }
 
         # optionally, skip the subsampling process
         if (n_subsamples < 1) {
@@ -405,9 +436,9 @@ calculate_auc = function(input,
         } else if (classifier == "lr") {
           family = ifelse(multiclass, 'multinomial', 'binomial')
 
-          if (is.null(lr_params$penalty) || lr_params$penalty == 'auto') {
+          if (is.null(lr_penalty) || lr_penalty == 'auto') {
             # first, get optimized penalty for dataset
-            lr_params$penalty = withCallingHandlers({
+            lr_penalty = withCallingHandlers({
               glmnet::cv.glmnet(X0 %>%
                           ungroup() %>%
                           select(-label) %>%
@@ -423,8 +454,8 @@ calculate_auc = function(input,
             })
           }
 
-          clf = logistic_reg(mixture = lr_params$mixture,
-                             penalty = lr_params$penalty,
+          clf = logistic_reg(mixture = lr_mixture,
+                             penalty = lr_penalty,
                              mode = 'classification') %>%
             set_engine('glmnet', family = family)
         } else {
@@ -574,7 +605,7 @@ calculate_auc = function(input,
           coefs = folded %>%
             pull(fits) %>%
             map("fit") %>%
-            map(~ as.matrix(coef(., s = lr_params$penalty)))
+            map(~ as.matrix(coef(., s = lr_penalty)))
           sds = folded %>%
             pull(splits) %>%
             map('data') %>%
@@ -640,7 +671,7 @@ calculate_auc = function(input,
       ungroup() %>%
       arrange(desc(ccc))
   }
-
+  
   # clean up results across lapply folds
   feature_importances = res %>%
     map("importances") %>%
@@ -677,6 +708,6 @@ calculate_auc = function(input,
   } else if (mode == "regression") {
     obj$CCC = CCCs
   }
-  
+
   return(obj)
 }
