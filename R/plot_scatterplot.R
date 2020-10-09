@@ -41,19 +41,18 @@ plot_scatterplot = function(augur1, augur2, top_n = 0) {
   limits = c(-max(abs(range)), max(abs(range)))
   limit_labs = format(limits, format = 'f', digits = 2)
   p = df %>%
-    ggplot(aes(x = auc.x, y = auc.y, color = delta)) +
+    ggplot(aes(x = auc.x, y = auc.y, fill = delta)) +
     geom_abline(aes(intercept = 0, slope = 1), linetype = 'dotted',
                 size = 0.3) +
-    geom_point(size = 0.6) + 
+    geom_point(size = 0.8, shape = 21, color = 'black', stroke = 0.33) + 
     geom_text_repel(data = labels, aes(label = cell_type), size = 2,
                     segment.size = 0.3, min.segment.length = 0.2, 
                     color = 'black') +
-    scale_x_continuous('AUC 1') +
-    scale_y_continuous('AUC 2') +
-    scale_color_gradientn(expression(Delta~AUC), colours = pal,
+    labs(x = 'AUC 1', y = 'AUC 2') +
+    scale_fill_gradientn(expression(Delta~AUC), colours = pal,
                           limits = limits, breaks = limits, 
                           labels = limit_labs) +
-    guides(color = guide_colorbar(frame.colour = 'black', ticks = FALSE)) +
+    guides(fill = guide_colorbar(frame.colour = 'black', ticks = FALSE)) +
     theme_bw() + 
     theme(axis.text.x = element_text(size = size_sm),
           axis.text.y = element_text(size = size_sm),
@@ -75,4 +74,3 @@ plot_scatterplot = function(augur1, augur2, top_n = 0) {
           aspect.ratio = 1)
   p
 }
-
