@@ -436,9 +436,9 @@ calculate_auc = function(input,
         } else if (classifier == "lr") {
           family = ifelse(multiclass, 'multinomial', 'binomial')
 
-          if (is.null(lr_penalty) || lr_penalty == 'auto') {
+          if (is.null(lr_params$penalty) || lr_params$penalty == 'auto') {
             # first, get optimized penalty for dataset
-            lr_penalty = withCallingHandlers({
+            lr_params$penalty = withCallingHandlers({
               glmnet::cv.glmnet(X0 %>%
                           ungroup() %>%
                           select(-label) %>%
@@ -454,8 +454,8 @@ calculate_auc = function(input,
             })
           }
 
-          clf = logistic_reg(mixture = lr_mixture,
-                             penalty = lr_penalty,
+          clf = logistic_reg(mixture = lr_params$mixture,
+                             penalty = lr_params$penalty,
                              mode = 'classification') %>%
             set_engine('glmnet', family = family)
         } else {
@@ -605,7 +605,7 @@ calculate_auc = function(input,
           coefs = folded %>%
             pull(fits) %>%
             map("fit") %>%
-            map(~ as.matrix(coef(., s = lr_penalty)))
+            map(~ as.matrix(coef(., s = lr_params$penalty)))
           sds = folded %>%
             pull(splits) %>%
             map('data') %>%
