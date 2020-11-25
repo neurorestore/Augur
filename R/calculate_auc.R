@@ -150,6 +150,7 @@ calculate_auc = function(input,
 ) {
   # check arguments
   classifier = match.arg(classifier)
+  augur_mode = match.arg(augur_mode)
   # check number of folds/subsample size are compatible (n > 1 in every fold)
   if (n_subsamples > 1 & subsample_size / folds < 2) {
     stop("subsample_size / n_folds must be greater than or equal to 2")
