@@ -41,9 +41,10 @@ To install Augur, first install the devtools package, if it is not already insta
 > install.packages("devtools") 
 ```
 
-Then, install the sparseMatrixStats package from GitHub using devtools:
+Then, install the MatrixGenerics and sparseMatrixStats packages from GitHub using devtools:
 
 ```r
+> devtools::install_github("Bioconductor/MatrixGenerics")
 > devtools::install_github("const-ae/sparseMatrixStats")
 ```
 
