@@ -31,10 +31,11 @@ Imports:
 	pals (>= 1.6),
 	scales (>= 1.1.1),
 	tidyr (>= 1.1.2),
+	glmnet (>= 3.0-2),
 	methods,
 	stats,
 	Rdpack (>= 0.7)
-Suggests: knitr, Seurat, monocle3, SingleCellExperiment, SummarizedExperiment, glmnet
+Suggests: knitr, Seurat, monocle3, SingleCellExperiment, SummarizedExperiment
 VignetteBuilder: knitr
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
