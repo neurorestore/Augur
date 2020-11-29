@@ -9,6 +9,7 @@ plot_umap(
   sc,
   mode = c("default", "rank"),
   reduction = "umap",
+  palette = "cividis",
   top_n = 0,
   cell_type_col = "cell_type"
 )
@@ -24,6 +25,12 @@ dimensionality reduction coordinates}
 
 \item{reduction}{the type of dimensionality reduction to extract from the
 \code{sc} object; defaults to 'umap'}
+
+\item{palette}{the color palette used to visualize the AUC for each cell
+type. Can be provided either a string specifying a ColorBrewer (see
+\code{\link{scale_color_distiller}}) or viridis (see
+\code{\link{scale_color_viridis}}) color palette, or a vector of
+colors that will be provided to \code{\link{scale_fill_gradientn}}}
 
 \item{top_n}{optionally, the number of top prioritized cell types to label
 in the plot}
@@ -41,4 +48,18 @@ Visualize the global landscape of the perturbation response across a
 single-cell dataset by superimposing cell type prioritizations (Augur
 AUCs, or their relative rank within the dataset) for each cell type onto
 a dimensionality reduction
+}
+\details{
+The following color maps can be specified using the \code{palette} argument:
+\enumerate{
+\item viridis color scales: magma, inferno, plasma, viridis, or cividis
+(the default)
+\item sequential ColorBrewer scales: BuGn, BuPu, GnBu, Greens, Greys,
+Oranges, OrRd, PuBu, PuBuGn, PuRd, Purples, RdPu, Reds, YlGn, YlGnBu,
+YlOrBr, or YlOrRd
+\item diverging ColorBrewer scales: BrBG, PiYG, PRGn, PuOr, RdBu, RdGy,
+RdYlBu, RdYlGn, or Spectral
+\item a vector of colors that will be passed into
+\code{scale_color_gradientn}
+}
 }
