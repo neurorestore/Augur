@@ -32,6 +32,7 @@ Imports:
 	scales (>= 1.1.1),
 	tidyr (>= 1.1.2),
 	glmnet (>= 3.0-2),
+	viridis (>= 0.5.1),
 	methods,
 	stats,
 	Rdpack (>= 0.7)
