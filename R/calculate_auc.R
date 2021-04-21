@@ -178,7 +178,7 @@ calculate_auc = function(input,
       droplevels()
     cell_types = meta[[cell_type_col]]
     labels = meta[[label_col]]
-    expr = Seurat::GetAssayData(input)
+    expr = Seurat::GetAssayData(input, slot = 'counts')
 
     # print default assay
     default_assay = Seurat::DefaultAssay(input)
