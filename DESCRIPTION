@@ -1,6 +1,6 @@
 Package: Augur
 Title: Cell type prioritization in high-dimensional single-cell data
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
   person("Michael", "Skinnider", email = "michael.skinnider@msl.ubc.ca",
          role = c("aut", "cre", "led")),
