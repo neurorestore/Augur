@@ -95,19 +95,19 @@ plot_umap = function(augur, sc, mode = c('default', 'rank'), reduction = 'umap',
       stop("install \"monocle3\" R package for Augur compatibility with ",
            "input monocle3 object", call. = FALSE)
     }
-    meta = monocle3::pData(input) %>%
+    meta = monocle3::pData(sc) %>%
       droplevels() %>%
       as.data.frame()
     reduction = toupper(reduction)
     red_coord = sc@int_colData@listData$reducedDims[[reduction]]
-  } else if ("SingleCellExperiment" %in% class(input)) {
+  } else if ("SingleCellExperiment" %in% class(sc)) {
     # confirm SingleCellExperiment is installed
     if (!requireNamespace("SingleCellExperiment", quietly = TRUE)) {
       stop("install \"SingleCellExperiment\" R package for Augur ",
            "compatibility with input SingleCellExperiment object",
            call. = FALSE)
     }
-    meta = SummarizedExperiment::colData(input) %>%
+    meta = SummarizedExperiment::colData(sc) %>%
       droplevels() %>%
       as.data.frame()
     reduction = toupper(reduction)
