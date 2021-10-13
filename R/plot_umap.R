@@ -152,7 +152,7 @@ plot_umap = function(augur, sc, mode = c('default', 'rank'), reduction = 'umap',
                             color = auc, fill = cell_type)) +
     geom_point(size = 0.4, stroke = 0.0, shape = 16) +
     labs(x = xlab, y = ylab) +
-    guides(fill = FALSE,
+    guides(fill = "none",
            color = guide_colorbar(nbin = 10, raster = FALSE, ticks = FALSE,
                                   title.position = 'top', title.hjust = 0.5)) +
     geom_text_repel(data = labels,
