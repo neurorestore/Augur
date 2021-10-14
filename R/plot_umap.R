@@ -95,23 +95,24 @@ plot_umap = function(augur, sc, mode = c('default', 'rank'), reduction = 'umap',
       stop("install \"monocle3\" R package for Augur compatibility with ",
            "input monocle3 object", call. = FALSE)
     }
-    meta = monocle3::pData(input) %>%
+    meta = monocle3::pData(sc) %>%
       droplevels() %>%
       as.data.frame()
     reduction = toupper(reduction)
     red_coord = sc@int_colData@listData$reducedDims[[reduction]]
-  } else if ("SingleCellExperiment" %in% class(input)) {
+  } else if ("SingleCellExperiment" %in% class(sc)) {
     # confirm SingleCellExperiment is installed
     if (!requireNamespace("SingleCellExperiment", quietly = TRUE)) {
       stop("install \"SingleCellExperiment\" R package for Augur ",
            "compatibility with input SingleCellExperiment object",
            call. = FALSE)
     }
-    meta = SummarizedExperiment::colData(input) %>%
+    meta = SummarizedExperiment::colData(sc) %>%
       droplevels() %>%
       as.data.frame()
     reduction = toupper(reduction)
     red_coord = sc@int_colData@listData$reducedDims[[reduction]]
+    rownames(red_coord) = colnames(sc)
   }
   colnames(red_coord)[1:2] = c('coord_x', 'coord_y')
   
@@ -152,7 +153,7 @@ plot_umap = function(augur, sc, mode = c('default', 'rank'), reduction = 'umap',
                             color = auc, fill = cell_type)) +
     geom_point(size = 0.4, stroke = 0.0, shape = 16) +
     labs(x = xlab, y = ylab) +
-    guides(fill = FALSE,
+    guides(fill = "none",
            color = guide_colorbar(nbin = 10, raster = FALSE, ticks = FALSE,
                                   title.position = 'top', title.hjust = 0.5)) +
     geom_text_repel(data = labels,
