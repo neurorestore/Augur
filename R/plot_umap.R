@@ -112,6 +112,7 @@ plot_umap = function(augur, sc, mode = c('default', 'rank'), reduction = 'umap',
       as.data.frame()
     reduction = toupper(reduction)
     red_coord = sc@int_colData@listData$reducedDims[[reduction]]
+    rownames(red_coord) = colnames(sc)
   }
   colnames(red_coord)[1:2] = c('coord_x', 'coord_y')
   
