@@ -54,7 +54,9 @@ Finally, install Augur from GitHub:
 > devtools::install_github("neurorestore/Augur")
 ```
 
-This should take no more than a few minutes.
+This should take no more than a few minutes. 
+
+Alternatively, a Python implementation of Augur is available through [pertpy](https://pertpy.readthedocs.io/en/latest/tutorials/notebooks/augurpy.html). Please see the pertpy [documentation](https://pertpy.readthedocs.io/en/latest) for installation and usage instructions. Please note that this implementation is not maintained by the maintainers of this repository, and requests for support should be submitted to the pertpy [issues tracker](https://github.com/theislab/pertpy).
 
 ## Usage
 
@@ -79,8 +81,14 @@ Cell type prioritizations are stored in the `AUC` data frame - for example:
 ```r
 > head(augur$AUC, 5)
 
-# A tibble: 20 x 2  cell_type   auc  <chr>       <dbl>1 cell type 1 0.7522 cell type 2 0.7293 cell type 3 0.674
-  ...         ...```
+# A tibble: 20 x 2
+  cell_type   auc
+  <chr>       <dbl>
+1 cell type 1 0.752
+2 cell type 2 0.729
+3 cell type 3 0.674
+  ...         ...
+```
 
 Augur can also run directly on a Seurat object. For a Seurat object `sc`, with the `sc@meta.data` data frame containing `cell_type` and `label` columns, simply do:
 
@@ -121,7 +129,12 @@ We run `calculate_auc`, and inspect the cell type prioritizations in the `AUC` i
 > augur = calculate_auc(sc_sim)
 > augur$AUC
 
-# A tibble: 3 x 2  cell_type   auc  <chr>     <dbl>1 CellTypeC 0.8662 CellTypeB 0.7633 CellTypeA 0.594
+# A tibble: 3 x 2
+  cell_type   auc
+  <chr>     <dbl>
+1 CellTypeC 0.866
+2 CellTypeB 0.763
+3 CellTypeA 0.594
 ```
 
 Augur has correctly recovered the simulated perturbation intensities. 
