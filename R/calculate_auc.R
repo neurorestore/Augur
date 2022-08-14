@@ -362,6 +362,7 @@ calculate_auc = function(input,
       # set up subsamples and results bin
       tmp_results = data.frame()
       tmp_importances = data.frame()
+      tmp_folded = list()
 
       n_iter = ifelse(n_subsamples < 1, 1, n_subsamples)
       for (subsample_idx in seq_len(n_iter)) {
@@ -632,8 +633,10 @@ calculate_auc = function(input,
         # add to results
         tmp_results %<>% bind_rows(result)
         tmp_importances %<>% bind_rows(importance)
+        tmp_folded[[length(tmp_folded) + 1]] = folded
       }
-      list(results = tmp_results, importances = tmp_importances)
+      list(results = tmp_results, importances = tmp_importances,
+           folded = tmp_folded)
     }
   )
 
@@ -680,6 +683,8 @@ calculate_auc = function(input,
   results = res %>%
     map("results") %>%
     bind_rows()
+  folded = res %>% 
+    map('folded')
 
   # create Augur object
   params = list(
@@ -702,7 +707,8 @@ calculate_auc = function(input,
     cell_types = cell_types,
     parameters = params,
     results = results,
-    feature_importance = feature_importances
+    feature_importance = feature_importances,
+    folded = folded
   )
   if (mode == "classification") {
     obj$AUC = AUCs
