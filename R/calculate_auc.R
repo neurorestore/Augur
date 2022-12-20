@@ -633,6 +633,38 @@ calculate_auc = function(input,
         # add to results
         tmp_results %<>% bind_rows(result)
         tmp_importances %<>% bind_rows(importance)
+        
+        # drop some unneeded elements of the saved model
+        folded$fits[[1]]$preproc = NULL
+        folded$fits[[2]]$preproc = NULL
+        folded$fits[[3]]$preproc = NULL
+        folded$recipes[[1]]$levels = NULL
+        folded$recipes[[2]]$levels = NULL
+        folded$recipes[[3]]$levels = NULL
+        folded$recipes[[1]]$template = NULL
+        folded$recipes[[2]]$template = NULL
+        folded$recipes[[3]]$template = NULL
+        folded$recipes[[1]]$term_info = NULL
+        folded$recipes[[2]]$term_info = NULL
+        folded$recipes[[3]]$term_info = NULL
+        folded$recipes[[1]]$orig_lvls = NULL
+        folded$recipes[[2]]$orig_lvls = NULL
+        folded$recipes[[3]]$orig_lvls = NULL
+        folded$recipes[[1]]$orig_lvls = NULL
+        folded$fits[[1]]$fit$localImportance = NULL
+        folded$fits[[2]]$fit$localImportance = NULL
+        folded$fits[[3]]$fit$localImportance = NULL
+        folded$fits[[1]]$fit$importance = NULL
+        folded$fits[[2]]$fit$importance = NULL
+        folded$fits[[3]]$fit$importance = NULL
+        folded$recipes[[1]]$last_term_info = NULL
+        folded$recipes[[2]]$last_term_info = NULL
+        folded$recipes[[3]]$last_term_info = NULL
+        folded$recipes[[1]]$var_info = NULL
+        folded$recipes[[2]]$var_info = NULL
+        folded$recipes[[3]]$var_info = NULL
+        folded$splits = NULL
+        folded$test_data = NULL
         tmp_folded[[length(tmp_folded) + 1]] = folded
       }
       list(results = tmp_results, importances = tmp_importances,
