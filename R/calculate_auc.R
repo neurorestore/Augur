@@ -139,6 +139,7 @@ calculate_auc = function(input,
                          feature_perc = 0.5,
                          n_threads = 4,
                          show_progress = T,
+                         select_var = T,
                          augur_mode = c('default', 'velocity', 'permute'),
                          classifier = c("rf", "lr"),
                          # random forest parameters
@@ -356,7 +357,7 @@ calculate_auc = function(input,
 
       # select features by variance
       min_features_for_selection = 1000
-      if (nrow(X) >= min_features_for_selection) {
+      if (nrow(X) >= min_features_for_selection & select_var) {
         X %<>% select_variance(var_quantile, filter_negative_residuals = F)
       }
 
