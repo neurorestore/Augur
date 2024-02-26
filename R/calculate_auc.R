@@ -305,6 +305,15 @@ calculate_auc = function(input,
       stop("multi-class classification with classifier = 'lr' is currently not ",
            "supported in tidymodels `logistic_reg`")
     }
+<<<<<<< HEAD
+=======
+
+    # make sure y is a factor if doing classification
+    if (!is.factor(labels)) {
+      warning("coercing labels to factor ...")
+      labels %<>% as.factor()
+    }
+>>>>>>> parent of 16d226f (fix label factor issue)
   }
 
   # check if showing progress or not
