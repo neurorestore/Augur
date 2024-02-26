@@ -178,8 +178,6 @@ calculate_auc = function(input,
 
     meta = input@meta.data %>%
       droplevels()
-    cell_types = meta[[cell_type_col]]
-    labels = meta[[label_col]]
     expr = Seurat::GetAssayData(input)
 
     # print default assay
@@ -195,8 +193,6 @@ calculate_auc = function(input,
     meta = monocle3::pData(input) %>%
       droplevels() %>%
       as.data.frame()
-    cell_types = meta[[cell_type_col]]
-    labels = meta[[label_col]]
     expr = monocle3::exprs(input)
   } else if ("SingleCellExperiment" %in% class(input)){
     # confirm SingleCellExperiment is installed
@@ -209,8 +205,6 @@ calculate_auc = function(input,
     meta = SummarizedExperiment::colData(input) %>%
       droplevels() %>%
       as.data.frame()
-    cell_types = meta[[cell_type_col]]
-    labels = meta[[label_col]]
     expr = SummarizedExperiment::assay(input)
   } else {
     # data frame or matrix plus metadata data frame
@@ -229,9 +223,16 @@ calculate_auc = function(input,
     # extract columns
     expr = input
     meta %<>% droplevels()
-    cell_types = meta[[cell_type_col]]
-    labels = meta[[label_col]]
   }
+
+  # remove all preset labels and refactor... label factors doesn't really matter anyway
+  if (!is.numeric(meta[[label_col]])) { # non-regression
+    meta[[label_col]] = factor(as.character(meta[[label_col]]))  
+  }
+  meta[[cell_type_col]] = as.character(meta[[cell_type_col]])
+
+  cell_types = meta[[cell_type_col]]
+  labels = meta[[label_col]]
 
   # check dimensions are non-zero
   if (length(dim(expr)) != 2 || !all(dim(expr) > 0)) {
@@ -304,10 +305,6 @@ calculate_auc = function(input,
       stop("multi-class classification with classifier = 'lr' is currently not ",
            "supported in tidymodels `logistic_reg`")
     }
-
-    # make sure y is a factor if doing classification
-    # remove all preset labels and refactor... label factors doesn't really matter anyway
-    meta$label = factor(unclass(meta$label))
   }
 
   # check if showing progress or not
