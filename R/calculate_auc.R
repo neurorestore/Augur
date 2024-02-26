@@ -306,10 +306,8 @@ calculate_auc = function(input,
     }
 
     # make sure y is a factor if doing classification
-    if (!is.factor(labels)) {
-      warning("coercing labels to factor ...")
-      labels %<>% as.factor()
-    }
+    # remove all preset labels and refactor... label factors doesn't really matter anyway
+    meta$label = factor(unclass(meta$label))
   }
 
   # check if showing progress or not
