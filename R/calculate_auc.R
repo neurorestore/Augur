@@ -233,6 +233,12 @@ calculate_auc = function(input,
     labels = meta[[label_col]]
   }
 
+  # label factor doesn't matter anyway
+  if (!is.numeric(meta[[label_col]])) {
+    meta[[label_col]] = as.factor(as.character(meta[[label_col]]))
+    labels = meta[[label_col]]
+  }
+  
   # check dimensions are non-zero
   if (length(dim(expr)) != 2 || !all(dim(expr) > 0)) {
     stop("expression matrix has at least one dimension of size zero")
