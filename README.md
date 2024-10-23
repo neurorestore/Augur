@@ -5,6 +5,7 @@ The intuition underlying Augur is that cells undergoing a profound response to a
 Augur quantifies this separability by asking how readily the experimental sample labels associated with each cell (e.g., treatment vs. control) can be predicted from molecular measurements alone. 
 This is achieved by training a machine-learning model specific to each cell type, to predict the experimental condition from which each individual cell originated.
 The accuracy of each cell type-specific classifier is evaluated in cross-validation, providing a quantitative basis for cell type prioritization.
+Augur is publised in https://www.nature.com/articles/s41587-020-0605-1.
 
 ## System requirements
 
