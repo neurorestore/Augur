@@ -372,10 +372,14 @@ calculate_auc = function(input,
       tmp_importances = data.frame()
 
       # Pre-define functions used within loop
-      seeded_rf <- function(form, data) {
+      seeded_rf <- function(form, data, mode) {
         target_indexes = which(colnames(data) == form[[2]]) # form[[2]] gets the lhs vars of the formula!
-
-        y_var = data[, target_indexes] %>% t() %>% as.factor() # This retrieves all columns corresponding to lhs vars
+        if (mode == 'classification') {
+          y_var = data[, target_indexes] %>% t() %>% as.factor() # This retrieves all columns corresponding to lhs vars
+        } else if (mode == 'regression') {
+          y_var = data[, target_indexes] %>% t() 
+        }
+        
         x_var = data[, -target_indexes] # This retrieves all columns which are not in lhs vars (equivalent to '.')
 
         # Additional, small amounts of preprocessing were required, as you can see above.
@@ -415,7 +419,8 @@ calculate_auc = function(input,
         test = bake(recipe, assessment(split))
         tbl = tibble(
           true = test$label,
-          pred = predict(model, test)$.pred)
+          pred = as.numeric(predict(model, test))
+        )
         return(tbl)
       }
 
@@ -463,7 +468,7 @@ calculate_auc = function(input,
       }
       if (rf_engine == "ranger") {
         importance_name = "variable.importance"
-        impval_name == ".x[[i]]"
+        impval_name = ".x[[i]]"
       }
 
       n_iter = ifelse(n_subsamples < 1, 1, n_subsamples)
@@ -575,7 +580,8 @@ calculate_auc = function(input,
                 test_data,
                 ~ seeded_rf(
                   form = label ~ .,
-                  data = bake(object = .x, new_data = .y)
+                  data = bake(object = .x, new_data = .y),
+                  mode = mode
                 )
               )
             )
