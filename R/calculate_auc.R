@@ -337,7 +337,57 @@ calculate_auc = function(input,
     # reset default subsamples
     n_subsamples = 500
   }
+  # Pre-define functions used within loop
+  seeded_rf <- function(form, data) {
+    target_indexes = which(colnames(data) == form[[2]]) # form[[2]] gets the lhs vars of the formula!
+    if (mode == 'classification') {
+      y_var = data[, target_indexes] %>% t() %>% as.factor() # This retrieves all columns corresponding to lhs vars
+    } else if (mode == 'regression') {
+      y_var = data[, target_indexes] %>% t() 
+    }
+    x_var = data[, -target_indexes] # This retrieves all columns which are not in lhs vars (equivalent to '.')
+
+    # Additional, small amounts of preprocessing were required, as you can see above.
+    original_seed <- .Random.seed # Save the state of the random seed
+    set.seed(1) # We have to do this in order to have similar behaviour to parsnip.
+
+    forest <- randomForest(
+      y = y_var,
+      x = x_var,
+      importance = TRUE,
+      localImp = TRUE,
+      ntree = rf_params$trees,
+      mtry = rf_params$mtry,
+      min_n = rf_params$min_n,
+      type = mode
+    )
+    .Random.seed <- original_seed # Restore random seed state
+    return (forest)
+  }
+
+  # predict on the left-out data
+  retrieve_class_preds = function(split, recipe, model) {
+    test = bake(recipe, assessment(split))
+    tbl = tibble(
+      true = test$label,
+      pred = predict(model, test),
+      prob = predict(model, test, type = 'prob')) %>%
+      # convert prob from nested df to columns
+      cbind(.$prob) %>%
+      select(-prob)
     
+    # Restore output syntax to be the exact same as that of parsnip
+    colnames(tbl)[levels(test$label) == colnames(tbl)] %<>% paste0(".pred_", .)
+    return(tbl)
+  }
+  retrieve_reg_preds = function(split, recipe, model) {
+    test = bake(recipe, assessment(split))
+    tbl = tibble(
+      true = test$label,
+      pred = as.numeric(predict(model, test))
+    )
+    return(tbl)
+  }
   # iterate over cell type clusters
   res = apply_fun(unique(cell_types),
     mc.cores = n_threads, function(cell_type) {
@@ -370,54 +420,6 @@ calculate_auc = function(input,
       # set up subsamples and results bin
       tmp_results = data.frame()
       tmp_importances = data.frame()
-
-      # Pre-define functions used within loop
-      seeded_rf <- function(form, data) {
-        target_indexes = which(colnames(data) == form[[2]]) # form[[2]] gets the lhs vars of the formula!
-
-        y_var = data[, target_indexes] %>% t() %>% as.factor() # This retrieves all columns corresponding to lhs vars
-        x_var = data[, -target_indexes] # This retrieves all columns which are not in lhs vars (equivalent to '.')
-
-        # Additional, small amounts of preprocessing were required, as you can see above.
-        original_seed <- .Random.seed # Save the state of the random seed
-        set.seed(1) # We have to do this in order to have similar behaviour to parsnip.
-
-        forest <- randomForest(
-          y = y_var,
-          x = x_var,
-          importance = TRUE,
-          localImp = TRUE,
-          ntree = rf_params$trees,
-          mtry = rf_params$mtry,
-          min_n = rf_params$min_n,
-          type = mode
-        )
-        .Random.seed <- original_seed # Restore random seed state
-        return (forest)
-      }
-
-      # predict on the left-out data
-      retrieve_class_preds = function(split, recipe, model) {
-        test = bake(recipe, assessment(split))
-        tbl = tibble(
-          true = test$label,
-          pred = predict(model, test),
-          prob = predict(model, test, type = 'prob')) %>%
-          # convert prob from nested df to columns
-          cbind(.$prob) %>%
-          select(-prob)
-        
-        # Restore output syntax to be the exact same as that of parsnip
-        colnames(tbl)[levels(test$label) == colnames(tbl)] %<>% paste0(".pred_", .)
-        return(tbl)
-      }
-      retrieve_reg_preds = function(split, recipe, model) {
-        test = bake(recipe, assessment(split))
-        tbl = tibble(
-          true = test$label,
-          pred = predict(model, test)$.pred)
-        return(tbl)
-      }
 
       # evalulate the predictions
       if (mode == 'regression') {
@@ -463,7 +465,7 @@ calculate_auc = function(input,
       }
       if (rf_engine == "ranger") {
         importance_name = "variable.importance"
-        impval_name == ".x[[i]]"
+        impval_name = ".x[[i]]"
       }
 
       n_iter = ifelse(n_subsamples < 1, 1, n_subsamples)
